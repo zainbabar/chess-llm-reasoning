@@ -1,4 +1,4 @@
-"""RL after SFT: GRPO with a binary reward from python-chess (THE PATH step 3).
+"""RL after SFT: GRPO with rewards computed by python-chess (runs/07 to runs/11, 17).
 
 Reward (--reward move, default): 1.0 if FINAL_MOVE is the Lichess answer (any mate accepted on the last move), 0
 otherwise, -0.1 if there is no parsable FINAL_MOVE. Master Distillation found a binary reward beat partial credit.
@@ -64,7 +64,7 @@ def main():
 
     from claim_check import SAN_RE, check
     from rewards import truth4
-    from run_pilot import build_prompt, grade, grade_line
+    from run_teacher import build_prompt, grade, grade_line
 
     n = a.max_steps * a.prompts_per_step
     pz = []

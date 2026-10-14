@@ -5,7 +5,7 @@ import sys
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))  # shared modules live in src/
 from code_trace import code_trace
-from run_pilot import build_prompt
+from run_teacher import build_prompt
 
 pool, out = sys.argv[1], sys.argv[2]
 n = 0

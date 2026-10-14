@@ -2,18 +2,22 @@
 
 [![tests](https://github.com/zainbabar/chess-llm-reasoning/actions/workflows/tests.yml/badge.svg)](https://github.com/zainbabar/chess-llm-reasoning/actions/workflows/tests.yml)
 
-**A 1.7B model trained on verified puzzle answers beats a 120B model on chess puzzles it has never seen: 63.3% vs 52.8%
+A 1.7B model trained on verified puzzle answers beats a 120B model on chess puzzles it has never seen: 63.3% vs 52.8%
 first moves right on 1,000 untouched puzzles, while writing about 300× fewer tokens. Trained on the 120B model's own
 explanations instead, it did worse. And when we used reinforcement learning to reward honest explanations, the model
-reward-hacked our fact-checker, in a new way each time.**
+reward-hacked our fact-checker, in a new way each time.
 
-![Puzzle ratings of the teacher and the two students](figures/ratings.png)
+I designed and directed this project; [Claude Code](https://claude.com/claude-code) wrote the code and ran the
+experiments. [How it was built](#how-it-was-built) describes who did what.
 
-*Puzzle ratings on the development set (the first 500 test puzzles), for the teacher and the two main students.*
+![First move right on 1,000 fresh puzzles: A + 200k 63.3%, A 55.5%, teacher at medium effort 52.8%, B 47.0%, teacher at low effort 41.6%](figures/fresh_results.png)
 
-**[Puzzle Explorer](https://zainbabar.github.io/chess-llm-reasoning/)**: an interactive site for the development-set
-results: step through all 500 puzzles and compare the teacher's answer with each student's written line, move by move.
-It doesn't yet include the newer models (A + 200k, reward v4) or the fresh test sets.
+*First move right on the 1,000 puzzles of the two fresh test sets, which no model or experiment had seen, with 95%
+bootstrap intervals. Tokens are output tokens per answer, including the teacher's hidden reasoning.*
+
+**[Puzzle Explorer](https://zainbabar.github.io/chess-llm-reasoning/)**: an interactive site over the 500
+development-set puzzles. Compare the teacher's answer with each student's written line, move by move, including
+A + 200k and student B after each of the five RL rewards.
 
 The project is about distillation: training a small "student" model on a large "teacher" model's outputs, here the
 teacher's written text (sequence-level distillation; [Kim & Rush, 2016](#references)) rather than its output
@@ -24,40 +28,37 @@ involved, before and after reinforcement learning (RL).
 The teacher is [gpt-oss-120b](https://huggingface.co/openai/gpt-oss-120b) served locally with
 [vLLM](https://github.com/vllm-project/vllm) on an ASUS Ascent GX10 (NVIDIA GB10, the DGX Spark design). The student is
 [Qwen3-1.7B](https://huggingface.co/Qwen/Qwen3-1.7B), run with thinking mode off. Every answer is graded automatically
-against the Lichess solution with [python-chess](https://python-chess.readthedocs.io/), and
-[Stockfish](https://stockfishchess.org/) was used to check that this grading is fair. Puzzles come from the
+against the Lichess solution with [python-chess](https://python-chess.readthedocs.io/).
+[Stockfish](https://stockfishchess.org/) checked the grading: none of the main models' 2,052 wrong answers was an
+equally good move. Puzzles come from the
 [Lichess puzzle database](https://database.lichess.org/#puzzles).
 
-**Status** (October 2026): the experiments are finished. The results were developed on 500 held-out puzzles (the
-*development set*) and then confirmed on two *fresh test sets* of 500 puzzles each that no model or experiment had seen,
-each evaluated once with the protocol committed beforehand. The key models were retrained with a second random seed.
-The reports behind every number are in [`reports/`](reports/).
-
-**Coming soon:** the graded outputs for the fresh test sets in `reports/outputs/` (the development-set outputs are
-there now), the newer models in the Puzzle Explorer, a measured accuracy for the claim checker, a fix for its negation
-bug (see Claim checker), and release of the training data and models.
+**Status:** finished (October 2026). The results were developed on 500 held-out puzzles (the *development set*) and
+then confirmed on two *fresh test sets* of 500 puzzles each that no model or experiment had seen, each evaluated once
+with the protocol committed beforehand. The key models were retrained with a second random seed. The reports behind
+every number are in [`reports/`](reports/), and every model's graded answers on all three test sets are in
+[`reports/outputs/`](reports/outputs/).
 
 ## Summary
 
-- **Small model, beats the teacher with enough verified answers.** Student A, Qwen3-1.7B fine-tuned on 37.5k puzzle
+- **With enough verified answers, the small model beats the teacher.** Student A, Qwen3-1.7B fine-tuned on 37.5k puzzle
   answers (just the move and its line), is **on par** with the 120B teacher at medium reasoning effort: 55.5% vs 52.8%
   over the 1,000 fresh puzzles, a gap of +2.7 points with a 95% interval of −0.8 to +6.3. Trained on 200k more answers,
   **A + 200k beats it: 63.3% vs 52.8%, +10.5 points (7.1 to 14.0), p ≈ 10⁻⁸**, and a retrained copy with new seeds does
   too. Both students clearly beat the teacher's low effort. Untrained, the same model solves 1.2%. The students write
-  about 26 tokens per answer against the teacher's ~8,400, mostly hidden reasoning (the two models count tokens
-  differently, so this is a rough ratio). The students are specialists, fine-tuned on Lichess puzzles like the test
+  about 26 tokens per answer against the teacher's ~8,200, mostly hidden reasoning (different tokenizers). The students are specialists, fine-tuned on Lichess puzzles like the test
   sets, while the teacher answers zero-shot.
 - **Copying the teacher's explanations hurt.** Training the same student on teacher-written explanations of the same
   puzzles made it worse: student B scores 47.0% on the fresh puzzles, 8.5 points below A (p ≈ 10⁻⁷), in every pairing
   of two training seeds each. Its explanations sound like the teacher's, but by our claim checker's count half of them
   contain a false claim about the position. Putting the answer before the explanation recovers about half of the gap.
-- **RL on reasoning led to reward hacking.** RL with verifiable rewards (RLVR: rewards computed by code, not by a
+- **Every reward that checked the reasoning got hacked.** RL with verifiable rewards (RLVR: rewards computed by code, not by a
   learned model) never lifted the explanation student past the answers-only one, and on fresh puzzles no reward lifted
   it significantly at all. Each of four rewards that also checked the reasoning fixed one problem, and each time the
   model reward-hacked the checker in a new way: vaguer text, stopping after one move, fake replies, and finally
   legal-looking but invented three-move lines, which reappeared when the run was repeated with a new seed.
 
-**Contents:** [Two examples](#two-examples) · [Setup](#setup) · [Findings](#findings) ([perception](#1-perception-is-a-major-weakness-of-the-teacher), [answers only](#2-a-small-student-trained-on-answers-matches-then-beats-the-teacher), [explanations](#3-imitating-the-teachers-explanations-made-the-student-worse), [RL](#4-rl-never-lifted-b-past-a-and-every-reward-on-the-reasoning-was-reward-hacked), [LLM judge](#5-the-llm-judge-we-tried-couldnt-grade-chess-explanations-reliably)) · [Takeaways](#takeaways) · [Limitations](#limitations) · [How we checked](#how-we-checked-the-results) · [How it was built](#how-it-was-built) · [Code and reproducing](REPRODUCING.md) · [References](#references)
+**Contents:** [Two examples](#two-examples) · [Setup](#setup) · [Findings](#findings) ([perception](#1-perception-is-a-major-weakness-of-the-teacher), [answers only](#2-a-small-student-trained-on-answers-draws-level-with-the-teacher-then-beats-it), [explanations](#3-imitating-the-teachers-explanations-made-the-student-worse), [RL](#4-rl-never-lifted-b-past-a-and-every-reward-on-the-reasoning-was-reward-hacked), [LLM judge](#5-the-llm-judge-couldnt-track-the-board)) · [Takeaways](#takeaways) · [Limitations](#limitations) · [How we checked](#how-we-checked-the-results) · [How it was built](#how-it-was-built) · [Code and reproducing](REPRODUCING.md) · [References](#references)
 
 ## Two examples
 
@@ -114,9 +115,9 @@ and asks whether that split (e.g. 111 vs 49) is more lopsided than coin flips wo
 with a 95% paired bootstrap interval.
 
 **Test sets.** All three sets have 500 puzzles in seven rating bands (800 to 2200, 71 or 72 each), drawn the same way.
-- The **development set** (`test_set.jsonl`) was held out from training but used while developing the experiments
+- The **development set** (`splits/dev.jsonl`) was held out from training but used while developing the experiments
   (see Limitations).
-- The **fresh test sets** (`fresh_test_set.jsonl`, `fresh_test_set_2.jsonl`) exclude every puzzle that appears
+- The **fresh test sets** (`splits/fresh_1.jsonl`, `splits/fresh_2.jsonl`) exclude every puzzle that appears
   anywhere in the project's files, along with their source games and every position along their solutions. Each was
   evaluated once, with the models, settings and primary comparisons fixed in a protocol committed before the run
   ([protocol 1](reports/fresh_test_protocol.md), [protocol 2](reports/fresh_test_2_protocol.md)).
@@ -147,7 +148,7 @@ notation), skips negated material and mate claims ("there is no mate"), and veri
 positions of the real solution. A false piece, material or mate claim is an error; an unplayable move or a wrong
 check/mate sign is a warning. It has three jobs here: filtering the teacher's explanations, measuring how honest the
 students' explanations are, and scoring the reasoning in the RL rewards. We built it because an LLM judge couldn't track
-the board (see finding 5). It misses many false claims, and it can rarely flag a true one: piece claims don't yet handle
+the board (see finding 5). It misses many false claims, and it can rarely flag a true one: piece claims don't handle
 negation ("there is no queen on b3"), which affected 1 of the 282 piece claims it flagged in student B's explanations.
 
 **Compute.** Everything ran on one ASUS Ascent GX10 (NVIDIA's GB10 chip, the DGX Spark design), a desktop machine with
@@ -178,13 +179,13 @@ description of the board helps much more:
 
 Both steps are significant in paired tests (p = 0.006 and p = 2e-6). The last one changes two things at once. In an
 early test on 140 of these puzzles, most of the gain came with the board description alone (32.1% to 42.1%, with no
-illegal moves) and little with the line request (45.0%), though that test is too small to separate them firmly.
+illegal moves) and little with the line request (45.0%), though that test is too small to separate the two.
 
 Thinking longer has diminishing returns: medium effort uses seven times the tokens of low effort for 8.6 more points
 (53.0% vs 44.4%, p = 0.0005), and in small tests high effort often ran out of its token budget. Details:
 [`reports/teacher_baseline.md`](reports/teacher_baseline.md).
 
-### 2. A small student trained on answers matches, then beats, the teacher
+### 2. A small student trained on answers draws level with the teacher, then beats it
 
 First move right on each test set (one attempt per puzzle; "pooled" = both fresh sets, 1,000 puzzles):
 
@@ -202,7 +203,7 @@ First move right on each test set (one attempt per puzzle; "pooled" = both fresh
 
 The comparisons fixed in advance, pooled over the 1,000 fresh puzzles (Holm-corrected; see Limitations):
 
-- **A vs the medium-effort teacher: +2.7 points (−0.8 to +6.3), p = 0.15: on par**, at most about a point behind.
+- **A vs the medium-effort teacher: +2.7 points (−0.8 to +6.3), p = 0.15: on par**; the 95% interval puts A at most 0.8 points behind.
   On each set separately the gap is +3.8 (dev), +3.2 and +2.2 points, never significant.
 - **A + 200k vs the medium-effort teacher: +10.5 points (7.1 to 14.0), Holm p = 1.4e-8.** It was also significantly
   ahead on the development set (+10.8) and on each fresh set (+10.0, +11.0), and so was its retrained copy on every set
@@ -219,9 +220,12 @@ the students' scores come from training, including learning to answer in the req
 
 On the development set, accuracy rose with every increase in answer data (1.9k → 5.6k → 21.6k puzzles with LoRA: 48.4%,
 49.6%, 51.2%; 37.5k with a full fine-tune: 56.8%), though the early steps are within noise and the last step also
-switched from LoRA to a full fine-tune with two passes. Band by band (about 71 puzzles each, so a pattern rather than a
-tested result), student A does best against the medium-effort teacher on harder puzzles: in the 1600 to 2000 bands it
-solves 67 of 142 development puzzles, the teacher 47.
+switched from LoRA to a full fine-tune with two passes.
+
+Band by band on the fresh sets (about 143 puzzles each, so a pattern rather than a tested result; figure below), A +
+200k is ahead of the medium-effort teacher in every band. Student A's edge is uneven: on the development set it did best
+on harder puzzles (1600 to 2000: 67 of 142 against the teacher's 47), but on the fresh sets the two tie there (114 of
+284 each), and A's lead comes mostly from the 1200–1400 and 2000–2200 bands.
 
 The teacher's written lines are about as good as the best student's. Stockfish checked every multi-move line whose
 first move was right: the line is "sound" if it's legal, every move by the solver is as good as Stockfish's best and
@@ -238,9 +242,9 @@ The Lichess solutions themselves pass this check 98% of the time.
 Details: [`reports/fresh_test.md`](reports/fresh_test.md),
 [`reports/replication_and_fresh_test_2.md`](reports/replication_and_fresh_test_2.md),
 [`reports/teacher_baseline.md`](reports/teacher_baseline.md), [`reports/student_A.md`](reports/student_A.md),
-[`reports/tightening_checks.md`](reports/tightening_checks.md), [`reports/final_checks.md`](reports/final_checks.md).
+[`reports/robustness_checks.md`](reports/robustness_checks.md), [`reports/baselines_and_line_soundness.md`](reports/baselines_and_line_soundness.md).
 
-![Share of puzzles solved per rating band](figures/by_band.png)
+![First move right per rating band on the fresh sets, for the teacher at both efforts, A and A + 200k](figures/by_band.png)
 
 ### 3. Imitating the teacher's explanations made the student worse
 
@@ -265,9 +269,9 @@ we trained **B answer-first** on B's exact texts with the line and move moved to
 explaining. Pooled over the 1,000 fresh puzzles, with two seeds of each model, it lands in between in every pairing:
 2.8 to 4.6 points below A and 4.5 to 6.0 points above B (all p < 0.05). So roughly half of the gap comes from answering
 after the explanation, and half from training on the explanation text itself. With one seed and the development and
-first fresh set only, the answer-first gain over B wasn't significant and we first read it as "mostly the prose"; the
-larger test changed that. Details: [`reports/students_A_vs_B.md`](reports/students_A_vs_B.md),
-[`reports/answer_first_sampling_rl_fresh.md`](reports/answer_first_sampling_rl_fresh.md),
+first fresh set only, the answer-first gain over B wasn't significant and pointed to the prose; the pooled two-seed
+test showed it's about half and half. Details: [`reports/students_A_vs_B.md`](reports/students_A_vs_B.md),
+[`reports/answer_first_and_sampling.md`](reports/answer_first_and_sampling.md),
 [`reports/replication_and_fresh_test_2.md`](reports/replication_and_fresh_test_2.md).
 
 ### 4. RL never lifted B past A, and every reward on the reasoning was reward-hacked
@@ -299,12 +303,12 @@ lost 3 to 6 points from the development set to the fresh set, against about 1 po
 rewards were redesigned while reading development outputs, so the development-set RL numbers were optimistic. RL with
 the answer-only reward cost A 9 points on the fresh set (p = 4e-5). Details:
 [`reports/rl_answer_only_reward.md`](reports/rl_answer_only_reward.md),
-[`reports/rl_five_rewards_B.md`](reports/rl_five_rewards_B.md),
-[`reports/answer_first_sampling_rl_fresh.md`](reports/answer_first_sampling_rl_fresh.md).
+[`reports/rl_rewards_B.md`](reports/rl_rewards_B.md),
+[`reports/answer_first_and_sampling.md`](reports/answer_first_and_sampling.md).
 
-![Student B under RL with the first four rewards](figures/rl_rewards.png)
+![Student B under RL with each of the five rewards, on the development set](figures/rl_rewards.png)
 
-### 5. The LLM judge we tried couldn't grade chess explanations reliably
+### 5. The LLM judge couldn't track the board
 
 Our judge (gpt-oss-120b, given the answer key) couldn't track the board any better than the writers: in one test, 13 of
 its 33 "bad" verdicts blamed moves as illegal that python-chess confirmed were legal. So the quality checks here are
@@ -313,23 +317,18 @@ worked better than grading the text afterwards.
 
 ## Takeaways
 
-- **A small specialist can beat a big generalist on a narrow task, given enough verified data.** On 37.5k verified
-  answers a 1.7B model was on par with the 120B teacher's medium effort; on ~240k it beat it by about 10 points on
-  1,000 untouched puzzles, while writing about 26 tokens per answer instead of about 8,400.
-- **For a small student, verified answers beat these imitated explanations.** Learning these teacher explanations cost
-  about 8 points: the student picked up the style without the ability to follow the board. About half of that cost
-  comes from answering after the explanation, half from training on the prose.
-- **A checker is useful as a filter or a meter, but weak as a reward.** Once the claim checker became part of the RL
-  reward, the model optimized the checker instead of the reasoning, which is reward hacking (Goodhart's law in RL: when
-  a measure becomes a target, it stops being a good measure): vague text, one-move lines, fake replies and invented
-  lines, each within a few hundred steps.
-- **Legal isn't correct.** Checking each claim on its own let the model write impossible sequences; checking the
-  sequence in order let it write possible but invented ones.
-- **Read outputs, not just metrics.** The v3 and v4 hacks didn't show in the training curves; they were found by
-  reading sample answers, and the warning sign was a metric moving the wrong way (v4's legal lines rose from 131 to 328
-  while exact solution matches fell).
-- **Test on data you didn't develop on.** Students A and A + 200k held their scores on fresh puzzles; the RL models,
-  whose rewards were tuned while reading development outputs, lost 3 to 6 points.
+- **The claim checker was useful for filtering and measuring, and it failed as a reward.** Once it became part of the
+  RL reward, the model optimized the checker instead of the reasoning (Goodhart's law: when a measure becomes a target,
+  it stops being a good measure). Each fix produced a new hack within a few hundred steps: vague text, one-move lines,
+  fake replies, invented lines.
+- **Checking that reasoning is legal wasn't enough.** Checking each claim on its own let the model write impossible
+  sequences; checking the sequence in order let it write possible but invented ones. A reward would have to check that
+  each step is right, for example that every opponent reply is a real defense.
+- **Only reading the outputs caught the last two hacks.** The v3 and v4 hacks didn't show in the training curves. The
+  warning sign was a metric moving the wrong way: v4's legal lines rose from 131 to 328 while exact solution matches
+  fell.
+- **The fresh test sets caught the RL models' optimism.** Students A and A + 200k held their scores on fresh puzzles;
+  the RL models, whose rewards were redesigned while reading development outputs, lost 3 to 6 points.
 
 ## Limitations
 
@@ -366,24 +365,22 @@ worked better than grading the text afterwards.
   mate, moves), checks each one on its own rather than in sequence, and misses claims like "the king has no escape
   squares", "the only defender" or "the only legal reply"; a vague text can avoid being checked at all. So its error
   rates mostly undercount (it misses many false claims and rarely flags a true one), and "clean" means "no checkable
-  false claim", not "correct". Our hand spot-checks of explanations are small, and the checker's accuracy hasn't been
-  measured yet. The Stockfish checks of lines and replies don't share these limits.
-- The teacher-written explanations and the trained models aren't released yet, so the training runs can't be reproduced
-  without running the teacher. The graded development-set outputs behind the main results are in `reports/outputs/`;
-  the fresh-set outputs and those of the newer models (A + 200k, the second seeds, answer-first, v4) aren't published
-  yet, only their reports. A few side numbers (the early prompt tests, the zero-shot check of other models, the effort
+  false claim", not "correct". Our hand spot-checks of explanations are small, and the checker's accuracy was never
+  measured. The Stockfish checks of lines and replies don't share these limits.
+- Not released: the teacher-written explanations and the trained models, so the training runs can't be reproduced
+  without running the teacher. Every model's graded answers on the three test sets are in `reports/outputs/`, and the
+  reports and figures can be rebuilt from them. A few side numbers (the early prompt tests, the zero-shot check of other models, the effort
   probes, the retry test, the data-collection tests in How it was built, the LLM-judge verdicts, the share of
   explanations filtered out, the training-target lengths and our spot-checks) come from logged exploratory runs and
-  training files that stay private. Each is described with its setup where it's cited.
+  training files that aren't included. Each is described with its setup where it's cited.
 - Puzzle ratings are on the Lichess puzzle scale, not player ratings.
 
-All of this ran on a single desktop machine. With more compute, the natural next steps are a larger student,
-better-written explanations, tuned RL with a reward that checks correctness (for example Stockfish-checked replies),
-and more detailed testing along those lines could reveal differences this setup can't.
+Natural next steps, not done here: a larger student, better-written explanations, and tuned RL with a reward that
+checks correctness, for example opponent replies checked by Stockfish.
 
 ## How we checked the results
 
-Every tool that produces a number here was checked before we trusted it, and the checks caught real problems.
+Before using a number, we checked the tool that produced it:
 
 | What could be wrong | How we checked | What we found |
 |---|---|---|
@@ -403,10 +400,10 @@ Every tool that produces a number here was checked before we trusted it, and the
 
 ## How it was built
 
-This is an independent research project I started out of curiosity: I wanted to run my own experiments on distillation,
-gauging how much a small model can learn from a large model's reasoning. I directed the project; [Claude
+This is an independent research project. I started it to answer a question: how much can a small model learn from a
+large model's reasoning? I directed the project; [Claude
 Code](https://claude.com/claude-code), working as an agent on the Spark, wrote the code and ran the experiments. I set
-the research questions, the experiments and the rules the agent worked under (the test set is only for evaluation,
+the research questions, the experiments and the rules the agent worked under (the test sets are only for evaluation,
 nothing is deleted, nothing costs money, nothing is committed without my approval); it proposed options, implemented
 them and logged every action, including its own mistakes. A few core decisions that shaped the direction of the project:
 
@@ -428,10 +425,15 @@ them and logged every action, including its own mistakes. A few core decisions t
   verdicts called legal moves illegal), I switched the quality checks to a rule-based claim checker on python-chess,
   which later became the core of the RL rewards.
 - **Changing one thing at a time.** Students A and B differ only in their training text, and each RL run for B only in
-  its reward, so every gap has one cause.
+  its reward, so each gap traces to a single designed difference.
 - **A strong baseline and careful claims.** I added a medium-effort teacher run so the student wasn't only measured
   against the teacher's weakest setting, and where a gap isn't significant, the write-up says so and gives its range
-  instead of claiming a win. The graded answers behind the main results are public, with an explorer to browse them.
+  instead of claiming a win. Every model's graded answers are public, with an explorer to browse them.
+- **Making the agent's work checkable.** The agent worked from a written rulebook and kept a timestamped log of every
+  run, including its own mistakes, and long runs started with a short smoke test. Before each fresh test, the protocol
+  (models, settings and the comparisons that count) was committed to git, so the results couldn't steer the analysis.
+  Twice I had a separate agent with no access to our conversation review the repo; the Codex review found the
+  late-position overlap and the claim checker's negation bug, both disclosed above.
 - **Letting each failure set the next step.** Every RL reward was designed from how the previous one was hacked; the
   last one replays the model's own line move by move, and was hacked too.
 

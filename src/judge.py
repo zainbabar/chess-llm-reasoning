@@ -269,7 +269,7 @@ async def main_async(args):
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--results", nargs="+", required=True, help="trace files from run_pilot.py")
+    ap.add_argument("--results", nargs="+", required=True, help="trace files from run_teacher.py")
     ap.add_argument("--analysis", nargs="+", required=True, help="engine_analysis.py output(s)")
     ap.add_argument("--puzzles", nargs="+", required=True, help="puzzle files (for the Lichess solution)")
     ap.add_argument("--out", required=True)

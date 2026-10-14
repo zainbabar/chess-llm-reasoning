@@ -7,28 +7,17 @@ __pycache__/
 # Lichess puzzle database (1.4 GB; re-download from https://database.lichess.org/#puzzles)
 data/
 
-# Raw model outputs, run logs and reports: large and regenerable by re-running the pipeline.
-# Back up results/*.jsonl separately (possible training data) — never delete them.
-# Run scripts (results/*.sh) are still tracked.
-results/*.jsonl
-results/*.log
-results/*.log.*
-results/*.md
-results/*.json
-results/*.minmem
-# per-run result folders (training data, eval outputs, reports: results/sft/, results/night2/, results/collect1/ ...)
-results/*/
+# Raw model outputs, run logs, local reports and training data: large, and regenerable by re-running the pipeline.
+# The public copies of the reports and graded outputs are in reports/. Never delete results/ (possible training data).
+results/
 
-# Trained student checkpoints (LoRA adapters / full models, GBs; regenerable with train_sft.py)
+# Trained student checkpoints (LoRA adapters / full models, GBs; regenerable with src/train_sft.py)
 ckpt/
 
-# Puzzle sets: regenerable with build_test_set.py / make_subset.py / build_pool.py (fixed seeds)
+# Puzzle pools: regenerable with src/build_pool.py / src/build_collect_pool.py / src/make_subset.py (fixed seeds)
 *.jsonl
-# ...except the held-out TEST SET: a rebuild from a newer Lichess download would differ
-!test_set.jsonl
-!fresh_test_set.jsonl
-!fresh_test_set_2.jsonl
-
+# ...except the evaluation sets in splits/: a rebuild from a newer Lichess download would differ
+!splits/*.jsonl
 
 # Claude Code local state
 .claude/scheduled_tasks.lock

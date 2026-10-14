@@ -1,4 +1,4 @@
-"""Stockfish analysis for engine-grounded traces (night1 stage A).
+"""Stockfish analysis for engine-grounded explanations (an early data-collection test, not used for the results).
 
 For each puzzle: Stockfish's top-3 candidate moves (multipv), each with its principal line (up to
 --pv-plies half-moves) and evaluation from the solver's point of view. The Lichess answer is always

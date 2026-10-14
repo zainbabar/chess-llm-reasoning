@@ -11,7 +11,7 @@ import json
 import chess
 
 from perception import board_diagram
-from run_pilot import build_prompt
+from run_teacher import build_prompt
 
 COMPACT_TAIL = ("Find the best move and the forcing line. End with two lines: FINAL_LINE: <the move and the expected "
                 "continuation as UCI moves> and FINAL_MOVE: <the move in UCI>.")

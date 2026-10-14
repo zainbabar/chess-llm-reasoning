@@ -1,8 +1,8 @@
-# RL run (~12 h on the Spark) — does imitated reasoning pay off after RL?
+# RL with a right-move reward (students A and B)
 
 GRPO from each SFT checkpoint, identical settings: binary reward (right move 1, wrong 0, no FINAL_MOVE −0.1),
 8 fresh puzzles × 8 samples per step (the same puzzles for A and B, never used before), lr 2e-6, temperature 1.0,
-no KL, DAPO loss. Test: 500 held-out puzzles, greedy, max 1,024 new tokens. Step 0 = the SFT model.
+no KL, DAPO loss. Test: 500 development-set puzzles, greedy, max 1,024 new tokens. Step 0 = the SFT model.
 
 ## A: answers only (RL steps: 390)
 
@@ -57,7 +57,7 @@ Teacher gpt-oss-120b (low, 1 attempt): 222/500.
 
 An earlier 100-step test on different puzzles (not included here) gave A 284 → 275, B 250 → 264.
 
-## Sanity notes (Claude, 2026-09-27 12:15)
+## Notes from reading the outputs (2026-09-27)
 
 - All 8 evals graded 500/500; parse fails 0; B final has 4 truncated answers.
 - **B's "legal line" 454 and "move flag 8%" at the final checkpoint are artifacts, not better reasoning:** RL taught B to
@@ -65,7 +65,7 @@ An earlier 100-step test on different puzzles (not included here) gave A 284 →
   only checks the first move), and a 1-move line is trivially legal; fewer written moves also means fewer move flags.
   A's lines shortened a little too (3.6 → 3.0 moves; full line right 90 → 69).
 - **B's explanations drifted into confident false mates:** they claim checkmate/forced mate on most of the 356 non-mate test
-  puzzles after RL: 286 (SFT: 40) by the mate-word count used in `rl_four_rewards_B.md` and the README, 293 (SFT: 55)
+  puzzles after RL: 286 (SFT: 40) by the mate-word count used in `rl_rewards_B.md` and the README, 293 (SFT: 55)
   by the claim checker. (This note first gave 255 vs 37 from an earlier, looser count.) Claim-clean on right answers 68% → 51%.
 - Spot-read of 3 puzzles B solves before and after RL (j05AW 830, b8msd 894, ggDHA 1526): SFT explanations 3/3 good
   (right idea + right continuation); after RL 3/3 bad (invented "checkmate", invented square control; step 260 invents
@@ -79,4 +79,4 @@ An earlier 100-step test on different puzzles (not included here) gave A 284 →
 - *(Added 2026-10-03.)* Each B checkpoint against **A after SFT** (284/500; exact McNemar, computed from
   `reports/outputs/`), the comparison behind the README's Finding 4. Answer-only reward, puzzles only A right vs only
   B right: step 130 51 vs 44 (p = 0.54); step 260 70 vs 38 (p = 0.0027); final 57 vs 37 (p = 0.0495). (The "B vs A at equal RL steps" lines above compare B with A *after A's
-  own RL*, which is a different question: final p = 0.84.) For the other rewards see `rl_five_rewards_B.md`.
+  own RL*, which is a different question: final p = 0.84.) For the other rewards see `rl_rewards_B.md`.

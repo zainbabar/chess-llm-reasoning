@@ -21,12 +21,12 @@ import chess.engine
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))  # shared modules live in src/
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import stockfish_grade as sg  # noqa: E402
-from path_A_report import load  # noqa: E402
+from outputs import load  # noqa: E402
 
 DEPTH = 18
 OUT_STEM = "results/reply_quality"  # <stem>.jsonl and <stem>.md; other scripts may point it elsewhere
 TOL = sg.ALT_TOLERANCE  # 5 win-% points
-DEV, FRESH = "test_set.jsonl", "fresh_test_set.jsonl"
+DEV, FRESH = "splits/dev.jsonl", "splits/fresh_1.jsonl"
 RUNS = [  # (label, puzzle file, outputs); "LICHESS" = the real solutions, a check of the method (should be ~100%)
     ("dev: Lichess solution (method check)", DEV, "LICHESS"),
     ("fresh: Lichess solution (method check)", FRESH, "LICHESS"),

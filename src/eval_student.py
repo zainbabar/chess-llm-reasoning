@@ -1,6 +1,6 @@
 """Zero-shot (or fine-tuned) evaluation of a small student model on puzzles, same prompt + grading as the teacher.
 
-The student is served by a second vLLM container (OpenAI API on another port). Uses run_pilot's
+The student is served by a second vLLM container (OpenAI API on another port). Uses run_teacher's
 build_prompt / grade / grade_line, so numbers are comparable with the teacher's P1L runs.
 
 Usage: .venv/bin/python eval_student.py --model Qwen/Qwen3-1.7B --port 8001 --tag qwen3_1.7b \
@@ -16,7 +16,7 @@ from pathlib import Path
 
 from openai import AsyncOpenAI
 
-from run_pilot import build_prompt, grade, grade_line, final_line_strict
+from run_teacher import build_prompt, grade, grade_line, final_line_strict
 
 THINK_RE = re.compile(r"<think>(.*?)</think>", re.DOTALL)
 

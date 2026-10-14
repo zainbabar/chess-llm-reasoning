@@ -1,7 +1,7 @@
 """Stockfish as a reference point: its first move on each puzzle at a fixed budget, graded by the same grader as the
-models (run_pilot.grade: first move vs the Lichess solution; in mate-in-one puzzles any mate counts).
+models (run_teacher.grade: first move vs the Lichess solution; in mate-in-one puzzles any mate counts).
 
-    python experiments/stockfish_baseline.py --puzzles fresh_test_set.jsonl --out results/fresh_stockfish.jsonl
+    python experiments/stockfish_baseline.py --puzzles splits/fresh_1.jsonl --out results/fresh_stockfish.jsonl
 """
 import argparse
 import json
@@ -12,12 +12,12 @@ import chess
 import chess.engine
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))  # shared modules live in src/
-from run_pilot import grade
+from run_teacher import grade
 
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--puzzles", default="fresh_test_set.jsonl")
+    ap.add_argument("--puzzles", default="splits/fresh_1.jsonl")
     ap.add_argument("--out", default="results/fresh_stockfish.jsonl")
     ap.add_argument("--seconds", type=float, default=0.1)
     ap.add_argument("--engine", default="/usr/games/stockfish")

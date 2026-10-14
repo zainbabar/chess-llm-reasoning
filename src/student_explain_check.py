@@ -6,7 +6,7 @@ from collections import Counter
 
 from claim_check import check
 
-P = {json.loads(l)["puzzle_id"]: json.loads(l) for l in open("test_set.jsonl")}
+P = {json.loads(l)["puzzle_id"]: json.loads(l) for l in open("splits/dev.jsonl")}
 R = {}
 for l in open(sys.argv[1]):
     r = json.loads(l)

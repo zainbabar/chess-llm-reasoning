@@ -2,7 +2,7 @@
 
 ## 1. A + 200k, replicated
 
-Replicate: A's second-seed model (`ckpt/path_A_seed1`) continued on the same 200k answers with seed 1, so both
+Replicate: A's second-seed model continued on the same 200k answers with seed 1, so both
 stages of the pipeline differ in their randomness from the original.
 
 - development: original 319/500 (63.8%), **replicate 319/500 (63.8%)**; replicate vs original: 22 vs 22, p = 1; gap +0.0 points (95% interval -2.6 to +2.6); replicate vs teacher medium: 114 vs 60, p = 5.2e-05; gap +10.8 points (95% interval +5.8 to +16.0)
@@ -84,7 +84,7 @@ Primary comparisons, pooled over both fresh sets (1,000) (exact McNemar, Holm ov
 - student A vs teacher, medium effort: 176 vs 149, p = 0.15; gap +2.7 points (95% interval -0.8 to +6.3); Holm-adjusted p = 0.15
 - student A + 200k vs teacher, medium effort: 213 vs 108, p = 4.7e-09; gap +10.5 points (95% interval +7.1 to +14.0); Holm-adjusted p = 1.4e-08
 
-## Notes (added by hand 2026-10-03, computed with `teacher_report.pair`)
+## Notes (added 2026-10-03; computed with `paired_tests.pair`)
 
 B answer-first pooled over both fresh sets (1,000 puzzles), every pairing of the two seeds of each model (secondary,
 not in the protocol):
@@ -96,7 +96,7 @@ not in the protocol):
 
 Answer-first sits significantly between A and B in all eight comparisons: about half of the A–B gap (8.5 points pooled)
 comes from answering after the explanation, half from training on the prose. This revises the one-seed reading in
-`answer_first_sampling_rl_fresh.md` ("mostly the prose").
+`answer_first_and_sampling.md` ("mostly the prose").
 
 The v4 replicate's "template wording" share (25%) is low because the regex matches seed 0's exact phrasing; seed 1
 writes the same structure in other words ("Thus the correct continuation is…"), as the three-move-line share (91%) and

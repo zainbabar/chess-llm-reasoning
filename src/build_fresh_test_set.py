@@ -1,4 +1,4 @@
-"""Build fresh_test_set.jsonl (defaults) or another fresh set (--seed, --out): 500 new puzzles for a one-time
+"""Build splits/fresh_1.jsonl (defaults) or another fresh set (--seed, --out): 500 new puzzles for a one-time
 evaluation (see reports/fresh_test_protocol.md, reports/fresh_test_2_protocol.md).
 
 Same recipe as build_test_set.py (same Lichess snapshot, 7 rating bands 800-2200, RatingDeviation <= 100, 72/72/72/71/
@@ -18,7 +18,7 @@ import chess
 
 from build_test_set import BANDS, CSV_PATH, MAX_RATING_DEVIATION, band_of
 
-OUT_PATH = "fresh_test_set.jsonl"
+OUT_PATH = "splits/fresh_1.jsonl"
 SEED = 20260929
 PER_BAND = [72, 72, 72, 71, 71, 71, 71]
 ID_RE = re.compile(rb'"puzzle_id": "([A-Za-z0-9]{5})"')

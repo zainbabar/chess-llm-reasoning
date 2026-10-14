@@ -1,4 +1,4 @@
-"""The one-time fresh test (reports/fresh_test_protocol.md) -> results/fresh_test_report.md.
+"""The one-time fresh test (reports/fresh_test_protocol.md) -> results/fresh_test.md.
 
 Reports exactly what the protocol fixed in advance: per model, first move right, full line right, puzzle rating
 (95% bootstrap interval), illegal / unreadable answers and output tokens; the three primary comparisons (A vs B, A vs
@@ -16,10 +16,10 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))  # shared m
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import chess  # noqa: E402
 
-from analyze_pilot import mcnemar  # noqa: E402
-from path_A_report import load  # noqa: E402
+from paired_tests import holm, mcnemar, pair  # noqa: E402
+from outputs import load  # noqa: E402
 from puzzle_rating import rate  # noqa: E402
-from teacher_report import _mates, pair  # noqa: E402
+from teacher_baseline_report import _mates  # noqa: E402
 
 MODELS = [  # (label, fresh-test output, development-set output)
     ("student A: answers only", "results/fresh_student_path_A.jsonl", "results/student_path_A_nothink.jsonl"),
@@ -35,16 +35,6 @@ MODELS = [  # (label, fresh-test output, development-set output)
 A, B, LOW, MED = MODELS[0][0], MODELS[1][0], MODELS[5][0], MODELS[6][0]
 PRIMARY = [(A, B), (A, LOW), (A, MED)]
 SECONDARY = [(MODELS[2][0], MED), (MODELS[2][0], LOW), (MODELS[2][0], A), (MODELS[3][0], B), (B, LOW), (B, MED), (MED, LOW)]
-
-
-def holm(ps):
-    """Holm-adjusted p-values, in the input order."""
-    order = sorted(range(len(ps)), key=lambda i: ps[i])
-    adj, run = [0.0] * len(ps), 0.0
-    for rank, i in enumerate(order):
-        run = max(run, min(1.0, (len(ps) - rank) * ps[i]))
-        adj[i] = run
-    return adj
 
 
 def random_expected(puzzles):
@@ -109,8 +99,8 @@ def report(puzzle_file, models, out):
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--puzzles", default="fresh_test_set.jsonl")
-    ap.add_argument("--out", default="results/fresh_test_report.md")
+    ap.add_argument("--puzzles", default="splits/fresh_1.jsonl")
+    ap.add_argument("--out", default="results/fresh_test.md")
     a = ap.parse_args()
     report(a.puzzles, MODELS, a.out)
 

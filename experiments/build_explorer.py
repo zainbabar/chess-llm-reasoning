@@ -1,13 +1,12 @@
-"""Build the Puzzle Explorer: one self-contained web page over the 500 test puzzles and every model's graded answer.
+"""Build the Puzzle Explorer: one self-contained web page over the 500 development-set puzzles and each model's answer.
 
-Reads test_set.jsonl and the graded outputs (results/, or the committed copies in reports/outputs/), and writes
+Reads splits/dev.jsonl and the graded outputs (results/, or the committed copies in reports/outputs/), and writes
   docs/index.html                  full page for GitHub Pages (Settings -> Pages -> branch master, folder /docs)
   <--artifact-out>                 the same page without the <html>/<head> wrapper (for a claude.ai preview)
 from the template experiments/explorer_template.html (its <!--BODY--> marker splits head from body).
 
 Per puzzle it stores the start position, the Lichess solution, and for each model: the grade, the move, the written line
-replayed on the board (stopping at the first illegal move) and, for the explanation students, the text. Newer runs
-(A on 200k more puzzles, the v4 reward) appear automatically once their evaluation files exist.
+replayed on the board (stopping at the first illegal move) and, for the explanation students, the text.
 """
 import argparse
 import json
@@ -19,7 +18,7 @@ import chess
 import chess.svg
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))  # shared modules live in src/
-from path_A_report import load
+from outputs import load
 from puzzle_rating import rate
 
 MODELS = [  # key, label, short label, file
@@ -75,7 +74,7 @@ def main():
     ap.add_argument("--artifact-out", default=None)
     a = ap.parse_args()
 
-    P = [json.loads(l) for l in open("test_set.jsonl")]
+    P = [json.loads(l) for l in open("splits/dev.jsonl")]
     D = {}
     for key, label, short, path in MODELS:
         R, _ = load(path)

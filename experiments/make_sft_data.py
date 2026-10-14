@@ -3,7 +3,7 @@
   --arm code     code-built explanation (code_trace.py), no LLM
   --arm answer   answer only: FINAL_LINE + FINAL_MOVE, no reasoning (control)
   --arm llm      LLM-written trace from --traces (kept only if: move right, line = solution, claim-check clean)
-Prompt = run_pilot.build_prompt(puzzle, "P1L"): exactly the evaluation prompt.
+Prompt = run_teacher.build_prompt(puzzle, "P1L"): exactly the evaluation prompt.
 """
 import argparse
 import json
@@ -13,7 +13,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))  # shared modules live in src/
 from claim_check import check
 from code_trace import code_trace
-from run_pilot import build_prompt
+from run_teacher import build_prompt
 
 
 def main():

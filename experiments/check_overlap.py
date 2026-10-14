@@ -2,7 +2,7 @@
 shared source games, and shared positions anywhere along the two solutions. A position is the piece placement, side to
 move, castling rights and en-passant square (move counters ignored), so a transposition counts as shared.
 
-    python experiments/check_overlap.py                       # the 500 test puzzles in test_set.jsonl
+    python experiments/check_overlap.py                       # the 500 test puzzles in splits/dev.jsonl
     python experiments/check_overlap.py --test other.jsonl    # any file of puzzles in the same format
 
 For each shared position it prints how many moves into the test solution it occurs (ply 0 = the position the model
@@ -64,7 +64,7 @@ def overlap(test, train_path="splits/train_puzzles.jsonl.gz", sets=None):
 
 def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    ap.add_argument("--test", default="test_set.jsonl")
+    ap.add_argument("--test", default="splits/dev.jsonl")
     ap.add_argument("--train", default="splits/train_puzzles.jsonl.gz")
     a = ap.parse_args()
     test = load_test(a.test)

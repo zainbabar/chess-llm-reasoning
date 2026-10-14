@@ -24,12 +24,12 @@ import chess.engine
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))  # shared modules live in src/
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import stockfish_grade as sg  # noqa: E402
-from path_A_report import load  # noqa: E402
+from outputs import load  # noqa: E402
 
 DEPTH = 18
 OUT_STEM = "results/line_soundness"  # <stem>.jsonl and <stem>.md; other scripts may point it elsewhere
 TOL = sg.ALT_TOLERANCE
-DEV, FRESH = "test_set.jsonl", "fresh_test_set.jsonl"
+DEV, FRESH = "splits/dev.jsonl", "splits/fresh_1.jsonl"
 MODELS = [  # (label, development outputs, fresh outputs)
     ("Lichess solution (method check)", "LICHESS", "LICHESS"),
     ("teacher, low effort", "results/test500_formatP1L.jsonl", "results/fresh_low_formatP1L.jsonl"),

@@ -9,7 +9,7 @@ ROOT = Path(__file__).resolve().parents[1]
 
 
 def test_students_A_B_and_rl_never_saw_a_test_puzzle():
-    test = load_test(ROOT / "test_set.jsonl")
+    test = load_test(ROOT / "splits/dev.jsonl")
     res = overlap(test, ROOT / "splits/train_puzzles.jsonl.gz", sets={"sft_37.5k_A_B", "rl_3120"})
     for name, r in res.items():
         assert not r["ids"] and not r["games"], name

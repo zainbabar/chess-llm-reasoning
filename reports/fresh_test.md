@@ -1,6 +1,6 @@
 # Fresh test: 500 puzzles no model or experiment had seen
 
-Puzzles: `fresh_test_set.jsonl`. Protocol, fixed before the run: `reports/fresh_test_protocol.md`. Same prompt,
+Puzzles: `splits/fresh_1.jsonl`. Protocol, fixed before the run: `reports/fresh_test_protocol.md`. Same prompt,
 grader and settings as the main evaluation. "First move right" is the main score.
 
 | Model | First move right | Puzzle rating (95% CI) | Illegal | No readable answer | Full line right | Output tokens (mean) |

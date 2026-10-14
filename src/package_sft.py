@@ -1,4 +1,4 @@
-"""Filter LLM-written traces and package them as SFT examples (used by results/run_collect40k.sh).
+"""Filter LLM-written traces and package them as SFT examples (used by runs/04_teacher_explanations.sh).
 
 Keep a trace only if: final move right, FINAL_LINE = Lichess solution, no engine/answer leak,
 claim_check clean (no false piece-on-square / illegal move / wrong +,# / false "wins the X" / false mate).
@@ -11,7 +11,7 @@ import json
 from collections import Counter
 
 from claim_check import check
-from run_pilot import build_prompt
+from run_teacher import build_prompt
 
 
 def main():

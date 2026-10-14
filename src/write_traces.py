@@ -23,7 +23,7 @@ from openai import AsyncOpenAI
 
 from line_facts import facts_text
 from perception import perception_block
-from run_pilot import ENGINE_HINT_RE, grade, grade_line
+from run_teacher import ENGINE_HINT_RE, grade, grade_line
 
 BASE_URL, MODEL = "http://localhost:8000/v1", "openai/gpt-oss-120b"
 

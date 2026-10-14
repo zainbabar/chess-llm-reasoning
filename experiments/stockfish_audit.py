@@ -16,19 +16,19 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))  # shared modules live in src/
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import stockfish_grade as sg  # noqa: E402
-from path_A_report import load  # noqa: E402
+from outputs import load  # noqa: E402
 
 DEPTH = 18
 RUNS = [  # (label, puzzle file, graded outputs)
-    ("teacher, medium effort (dev)", "test_set.jsonl", "results/test500_med_formatP1L.jsonl"),
-    ("teacher, medium effort (fresh)", "fresh_test_set.jsonl", "results/fresh_med_formatP1L.jsonl"),
-    ("teacher, low effort (fresh)", "fresh_test_set.jsonl", "results/fresh_low_formatP1L.jsonl"),
-    ("student A (dev)", "test_set.jsonl", "results/student_path_A_nothink.jsonl"),
-    ("student A (fresh)", "fresh_test_set.jsonl", "results/fresh_student_path_A.jsonl"),
-    ("student A + 200k (dev)", "test_set.jsonl", "results/student_path_A200k_nothink.jsonl"),
-    ("student A + 200k (fresh)", "fresh_test_set.jsonl", "results/fresh_student_path_A200k.jsonl"),
-    ("student B (dev)", "test_set.jsonl", "results/student_path_B_nothink.jsonl"),
-    ("student B (fresh)", "fresh_test_set.jsonl", "results/fresh_student_path_B.jsonl"),
+    ("teacher, medium effort (dev)", "splits/dev.jsonl", "results/test500_med_formatP1L.jsonl"),
+    ("teacher, medium effort (fresh)", "splits/fresh_1.jsonl", "results/fresh_med_formatP1L.jsonl"),
+    ("teacher, low effort (fresh)", "splits/fresh_1.jsonl", "results/fresh_low_formatP1L.jsonl"),
+    ("student A (dev)", "splits/dev.jsonl", "results/student_path_A_nothink.jsonl"),
+    ("student A (fresh)", "splits/fresh_1.jsonl", "results/fresh_student_path_A.jsonl"),
+    ("student A + 200k (dev)", "splits/dev.jsonl", "results/student_path_A200k_nothink.jsonl"),
+    ("student A + 200k (fresh)", "splits/fresh_1.jsonl", "results/fresh_student_path_A200k.jsonl"),
+    ("student B (dev)", "splits/dev.jsonl", "results/student_path_B_nothink.jsonl"),
+    ("student B (fresh)", "splits/fresh_1.jsonl", "results/fresh_student_path_B.jsonl"),
 ]
 
 

@@ -7,10 +7,10 @@ Positions are made up for the tests (never taken from the held-out test set):
 import chess
 import pytest
 
-from analyze_pilot import mcnemar
+from paired_tests import mcnemar
 from claim_check import check
 from puzzle_rating import rate
-from run_pilot import grade, grade_line
+from run_teacher import grade, grade_line
 from test_perception import check as perception_roundtrip
 
 MATE = {"fen": "6k1/5ppp/8/8/8/8/8/R5K1 w - - 0 1", "correct_move": "a1a8", "full_solution": ["a1a8"],

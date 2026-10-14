@@ -29,7 +29,7 @@ import re
 import chess
 
 from claim_check import SAN_RE, _boards, check
-from run_pilot import grade, grade_line
+from run_teacher import grade, grade_line
 
 SEQ_GAP_RE = re.compile(r"^\s*(?:\d+\s*\.(?:\s*\.\.)?\s*|\.\.\.\s*)?$")  # only spaces and move numbers between moves
 
