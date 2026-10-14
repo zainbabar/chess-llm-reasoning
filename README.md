@@ -403,9 +403,8 @@ Before using a number, we checked the tool that produced it:
 This is an independent research project. I started it to answer a question: how much can a small model learn from a
 large model's reasoning? I directed the project; [Claude
 Code](https://claude.com/claude-code), working as an agent on the Spark, wrote the code and ran the experiments. I set
-the research questions, the experiments and the rules the agent worked under (the test sets are only for evaluation,
-nothing is deleted, nothing costs money, nothing is committed without my approval); it proposed options, implemented
-them and logged every action, including its own mistakes. A few core decisions that shaped the direction of the project:
+the research questions, the experiments and the rules the agent worked under; it proposed options, implemented them
+and logged every action, including its own mistakes. A few core decisions that shaped the direction of the project:
 
 - **Diagnosing the teacher before copying it.** The first test showed gpt-oss-120b playing illegal moves 22% of the time
   from a raw position, so I made perception the starting point: give the teacher a python-chess description of the

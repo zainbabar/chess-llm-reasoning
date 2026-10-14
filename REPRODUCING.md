@@ -48,6 +48,13 @@ Key files in `src/`:
 | `puzzle_rating.py`, `paired_tests.py` | Puzzle ratings with confidence intervals; McNemar tests, paired bootstrap intervals and the Holm correction |
 | `outputs.py` | Where each model's graded answers live, locally and in `reports/outputs/` |
 | `stockfish_grade.py` | The Stockfish rule for "equally good alternative" (used by the audits in `experiments/`) |
+| `code_trace.py`, `aux_tasks.py`, `student_explain_check.py` | Code-built explanations and board-tracking practice tasks (the LoRA comparisons); the claim check of B's own explanations |
+| `mem_guard.sh` | Stops the teacher's container if free memory falls below 8 GiB (the machine's memory is shared by CPU and GPU) |
+
+Early data-collection scripts, tried and dropped before the main experiments: `judge.py` (the LLM judge),
+`structured.py` and `verify_trace.py` (a structured solver format checked step by step), `engine_analysis.py`
+(explanations written from Stockfish analysis), `select_unsolved.py` and `make_subset.py` (teacher retries on a
+140-puzzle subset).
 
 Each public report `reports/<name>.md` is written by `experiments/<name>_report.py` (as `results/<name>.md`) and copied
 by `experiments/export_reports.py`. The LoRA reports come from `students_lora_pilot_report.py` and
